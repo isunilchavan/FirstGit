@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration Form</title>
+</head>
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        background: url('gym.png');
+        background-size: cover;
+        font-family: Arial, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+    }
+
+    .container {
+        background-color: rgba(255, 255, 255, 0.8);
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        max-width: 400px;
+        width: 100%;
+    }
+
+    h1 {
+        text-align: center;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+    }
+
+    input {
+        width: 95%;
+        padding: 10px;
+        margin-bottom: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+
+    button {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        width: 100%;
+    }
+
+    .delete-btn {
+        margin-top: 10px;
+    }
+
+    .edit-btn {
+        margin-top: 10px;
+    }
+</style>
+
+<body>
+    <div class="container">
+        <form id="registration-form">
+            <h1>Registration Form</h1>
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" required>
+
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" required>
+
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required>
+
+            <label for="date">Date</label>
+            <input type="date" id="date" name="date" required>
+
+            <label for="time">Time</label>
+            <input type="time" id="time" name="time" required>
+
+            <button type="submit">Submit</button>
+
+            <button class="delete-btn" data-username="username">Delete</button>
+            <button class="edit-btn" type="submit">Edit</button>
+        </form>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const form = document.getElementById('registration-form');
+
+                form.addEventListener('submit', function (event) {
+                    event.preventDefault();
+
+                    // Step 1: Initialize Local Storage Data
+                    let userArray = JSON.parse(localStorage.getItem('userDetailsArray')) || [];
+
+                    // Step 2: Capture User Input
+                    const username = document.getElementById('username').value;
+                    const email = document.getElementById('email').value;
+                    const password = document.getElementById('password').value;
+                    const date = document.getElementById('date').value;
+                    const time = document.getElementById('time').value;
+
+                    // Step 3: Create User Object
+                    const userDetails = {
+                        username,
+                        email,
+                        password,
+                        date,
+                        time
+                    };
+
+                    // Step 4: Add User Object to Array
+                    userArray.push(userDetails);
+
+                    // Step 5: Update Local Storage
+                    localStorage.setItem('userDetailsArray', JSON.stringify(userArray));
+
+                    form.reset();
+                });
+            });
+            document.addEventListener('DOMContentLoaded', function () {
+                const form = document.getElementById('registration-form');
+                const userArray = JSON.parse(localStorage.getItem('userDetailsArray')) || [];
+
+                function updateUserList() {
+                    const userList = document.getElementById('user-list');
+                    userList.innerHTML = '';
+
+                    userArray.forEach((userDetails, index) => {
+                        const entry = document.createElement('div');
+                        entry.className = 'registration-entry';
+                        entry.innerHTML = `
+                        <p><strong>Username:</strong> ${userDetails.username}</p>
+                        <p><strong>Email:</strong> ${userDetails.email}</p>
+                        <p><strong>Date:</strong> ${userDetails.date}</p>
+                        <p><strong>Time:</strong> ${userDetails.time}</p>
+                        <button class="edit-btn" data-index="${index}">Edit</button>
+                        <button class="delete-btn" data-index="${index}">Delete</button>
+                    `;
+
+                        userList.appendChild(entry);
+                    });
+                }
+
+                updateUserList();
+
+                form.addEventListener('submit', function (event) {
+                    event.preventDefault();
+
+                    const username = document.getElementById('username').value;
+                    const email = document.getElementById('email').value;
+                    const password = document.getElementById('password').value;
+                    const date = document.getElementById('date').value;
+                    const time = document.getElementById('time').value;
+
+                    const userDetails = {
+                        username,
+                        email,
+                        password,
+                        date,
+                        time
+                    };
+
+                    userArray.push(userDetails);
+                    localStorage.setItem('userDetailsArray', JSON.stringify(userArray));
+
+                    form.reset();
+                    updateUserList();
+                });
+
+
+                document.addEventListener('DOMContentLoaded', function () {
+                    const deleteButtons = document.querySelectorAll('.delete-btn');
+
+                    // Handle delete button clicks
+                    deleteButtons.forEach(button => {
+                        button.addEventListener('click', function () {
+                            const username = button.getAttribute('data-username');
+                            if (confirm(`Are you sure you want to delete ${userDetails}'s registration?`)) {
+                                // Remove from local storage
+                                const storedEntries = JSON.parse(localStorage.getItem('registrations')) || [];
+                                const updatedEntries = storedEntries.filter(entry => entry.username !== username);
+                                localStorage.setItem('registrations', JSON.stringify(updatedEntries));
+
+                                // Remove from the UI
+                                const registrationEntry = button.closest('.registration-entry');
+                                registrationEntry.remove();
+                            }
+                        });
+                    });
+                });
+
+                // Fill the form with existing data for editing
+                document.getElementById('username').value = userDetails.username;
+                document.getElementById('email').value = userDetails.email;
+                document.getElementById('password').value = userDetails.password;
+                document.getElementById('date').value = userDetails.date;
+                document.getElementById('time').value = userDetails.time;
+
+                // Remove the old data when submitting the edited form
+                form.addEventListener('submit', function (e) {
+                    e.preventDefault();
+
+                    userDetails.username = document.getElementById('username').value;
+                    userDetails.email = document.getElementById('email').value;
+                    userDetails.password = document.getElementById('password').value;
+                    userDetails.date = document.getElementById('date').value;
+                    userDetails.time = document.getElementById('time').value;
+
+                    localStorage.setItem('userDetailsArray', JSON.stringify(userArray));
+
+                    // Reset form and update the user list
+                    form.reset();
+                    updateUserList();
+                });
+            }
+                );
+
+
+        </script>
+</body>
+
+</html>
