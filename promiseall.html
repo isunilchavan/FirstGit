@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <h1>Hello World</h1>
+
+    <script>
+
+        // Simulated user data
+        const user = {
+            id: 1,
+            lastActivityTime: null,
+            posts: [],
+        };
+
+        // Simulated create post function that returns a Promise
+        function createPost(post) {
+            return new Promise((resolve, reject) => {
+                setTimeout(() => {
+                    user.posts.push(post);
+                    updateLastUserActivityTime() // Update last activity time after creating a post
+                        .then(() => {
+                            resolve(post);
+                        })
+                        .catch(reject);
+                }, 1000);
+            });
+        }
+
+        // Simulated update last user activity time function that returns a Promise
+        function updateLastUserActivityTime() {
+            return new Promise((resolve, reject) => {
+                setTimeout(() => {
+                    const currentTime = new Date().toISOString();
+                    user.lastActivityTime = currentTime;
+                    resolve(currentTime);
+                }, 1000);
+            });
+        }
+
+        // Simulated delete post function that returns a Promise
+        function deleteLastPost() {
+            return new Promise((resolve, reject) => {
+                setTimeout(() => {
+                    if (user.posts.length > 0) {
+                        user.posts.pop(); // Delete the last post
+                        updateLastUserActivityTime() // Update last activity time after deleting a post
+                            .then(() => {
+                                resolve();
+                            })
+                            .catch(reject);
+                    } else {
+                        reject(new Error("No posts to delete"));
+                    }
+                }, 1000);
+            });
+        }
+
+        // Usage
+        async function main() {
+            try {
+                const post = await createPost("New Post");
+                const activityTime = await updateLastUserActivityTime();
+
+                console.log("All posts:", user.posts);
+                console.log("Last Activity Time:", activityTime);
+
+                await deleteLastPost();
+                console.log("Posts after deletion:", user.posts);
+            } catch (error) {
+                console.error(error.message);
+            }
+        }
+
+        main();
+
+    </script>
+</body>
+
+</html>
